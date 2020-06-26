@@ -1,11 +1,23 @@
 cmake_minimum_required(VERSION 3.15)
-set(CMAKE_CXX_COMPILER g++)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wpedantic --pedantic-errors")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -pedantic-errors -Wfatal-errors -fanalyzer")
+
+file(GLOB engine_sources
+    "core/**.c"
+)
+
+include_directories(".")
+
+message("sources: ${engine_sources}")
+
+project(Engine)
+
+add_library(Engine ${engine_sources})
 
 project(antsim-c)
 
-add_executable(${CMAKE_PROJECT_NAME} main.cpp)
+add_executable(antsim-c main.c)
 
-#target_link_libraries(${CMAKE_PROJECT_NAME} )
+target_link_libraries(antsim-c Engine)
