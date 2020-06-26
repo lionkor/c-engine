@@ -56,6 +56,42 @@ extern void* vector_at(Vector* vector, size_t index) {
     return vector->data + index * vector->elem_size;
 }
 
+void vector_clear(Vector* vector) {
+    ASSERT_NOT_NULL(vector);
+    memset(vector->data, 0, vector->size * vector->elem_size);
+    vector->size = 0;
+}
+
+void vector_erase(Vector* vector, void* iter) {
+    ASSERT_NOT_NULL(vector);
+    ASSERT_NOT_NULL(iter);
+    void*  begin      = vector->data;
+    void*  end        = vector->data + vector->size * vector->elem_size;
+    size_t step_bytes = vector->elem_size;
+    size_t size_bytes = vector->size * vector->elem_size;
+    ASSERT(begin <= iter);
+    ASSERT(end >= iter);
+    if (iter == end) {
+        return;
+    }
+    if (iter == end - step_bytes) {
+        // erase last
+        // [ O O O O A X ]
+        //             ^ to erase
+        // [ O O O O A . ]
+        // set all to 0x0
+        memset(iter, 0, step_bytes);
+    } else {
+        // erase somewhere in between
+        // => shift right side one to the left
+        // [ O A X B O O ]
+        //       ^ to erase
+        // [ O A B O O . ]
+        memmove(iter, iter + step_bytes, size_bytes - (iter - begin));
+    }
+    vector->size -= 1;
+}
+
 void vector_destroy(Vector* vector) {
     if (vector) {
         FREE(vector->data);

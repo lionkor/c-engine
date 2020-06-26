@@ -13,19 +13,22 @@ Window* window_create(size_t width, size_t height, const char* title) {
     window->height = height;
     strncpy(window->title, title, sizeof(window->title));
 
+    // vector of SDL_Texture*
+    window->sdl_textures = vector_create(sizeof(SDL_Texture*), 0);
+
     // initialize SDL
 
     uint res = SDL_Init(SDL_INIT_VIDEO);
 
     if (res != 0) {
-        printf("error initializing SDL: %s\n", SDL_GetError());
+        log_sdl_error("SDL_Init");
         return NULL;
     }
 
     window->sdl_window = SDL_CreateWindow(window->title, 20, 20, window->width, window->height, SDL_WINDOW_SHOWN);
 
     if (window->sdl_window == NULL) {
-        printf("error creating SDL window: %s\n", SDL_GetError());
+        log_sdl_error("SDL_CreateWindow");
         window_destroy(window);
         return NULL;
     }
@@ -33,7 +36,7 @@ Window* window_create(size_t width, size_t height, const char* title) {
     window->sdl_renderer = SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     if (window->sdl_renderer == NULL) {
-        printf("error creating SDL renderer: %s\n", SDL_GetError());
+        log_sdl_error("SDL_CreateRenderer");
         window_destroy(window);
         return NULL;
     }
@@ -48,6 +51,13 @@ void window_destroy(Window* window) {
         }
         if (window->sdl_window) {
             SDL_DestroyWindow(window->sdl_window);
+        }
+        if (window->sdl_textures) {
+            for (size_t i = 0; i < window->sdl_textures->size; ++i) {
+                SDL_Texture* texture = vector_at(window->sdl_textures, i);
+                FREE(texture);
+            }
+            vector_destroy(window->sdl_textures);
         }
         SDL_Quit();
     }

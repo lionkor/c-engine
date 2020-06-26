@@ -19,5 +19,7 @@
 
 typedef unsigned int uint;
 
+#define log_sdl_error(str) printf("%s:%d: SDL Error in %s (%s): %s", __FILE__, __LINE__, __FUNCTION__, str, SDL_GetError());
+
 #endif // COMMON_H
 

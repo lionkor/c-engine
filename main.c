@@ -10,17 +10,18 @@ int main() {
     printf("window title: %s\n", window_title(window));
 
     Vector* vec = vector_create(sizeof(int), 0);
-
+    vector_reserve(vec, 15);
     for (int i = 0; i < 10; ++i) {
         vector_append(vec, &i);
     }
 
-    for (int i = 0; i < 10; ++i) {
-        printf("at %d: %d\n", i, *(int*)vector_at(vec, i));
+    for (int k = 0; k < 15; ++k) {
+        printf("erasing!\n");
+        vector_erase(vec, vec->data);
+        for (int i = 0; i < vec->size; ++i) {
+            printf("vec[%d] = %d\n", i, *(int*)vector_at(vec, i));
+        }
     }
-
-    vector_destroy(vec);
-    vec = NULL;
 
     /*
     while (true) {
