@@ -10,12 +10,14 @@ typedef void Window;
 #else // CORE_WINDOW_INTERNAL
 
 #include <SDL2/SDL.h>
+#include "utils/utils_vector.h"
 typedef struct {
     size_t        width;
     size_t        height;
     char          title[256];
     SDL_Window*   sdl_window;
     SDL_Renderer* sdl_renderer;
+    Vector*       sdl_textures;
 } Window;
 
 #endif // CORE_WINDOW_INTERNAL

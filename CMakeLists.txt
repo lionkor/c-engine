@@ -5,7 +5,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -pedantic-errors -Wfatal-errors -fanalyzer")
 
 file(GLOB engine_sources
-    "core/**.c"
+    "core/**.c" "utils/**.c"
 )
 
 include_directories(".")
