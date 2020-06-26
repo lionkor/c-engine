@@ -17,4 +17,7 @@
 #define ASSERT_NOT_NULL(x) assert((x) != NULL)                                                      /* assert(cond) */
 #define ASSERT_NOT_REACHABLE() printf("unreachable code reached in \"%s:%d\"", __FILE__, __LINE__); /* asserts if reached */
 
+typedef unsigned int uint;
+
 #endif // COMMON_H
+

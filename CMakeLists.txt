@@ -16,6 +16,8 @@ project(Engine)
 
 add_library(Engine ${engine_sources})
 
+target_link_libraries(Engine SDL2)
+
 project(antsim-c)
 
 add_executable(antsim-c main.c)

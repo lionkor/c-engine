@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "common.h"
 #include "core.h"
 
 int main() {
@@ -6,6 +7,10 @@ int main() {
     World*  world  = world_create();
 
     printf("window title: %s\n", window_title(window));
+
+    while (true) {
+        window_draw(window);
+    }
 
     world_destroy(world);
     world = NULL;
