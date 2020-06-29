@@ -34,11 +34,8 @@ void* vector_append(Vector* vector, void* element) {
     ASSERT_NOT_NULL(element);
     ASSERT(vector->size <= vector->capacity); // !(size > capacity)
     if (vector->size == vector->capacity) {
-        printf("growing %p from %lu to ", vector, vector->capacity);
         vector_reserve(vector, vector->capacity + vector->capacity / 1.5 + 1);
-        printf("%lu\n", vector->capacity);
     } else {
-        printf("not growing\n");
     }
     size_t index = vector->size;
     void*  iter  = memcpy(vector->data + index * vector->elem_size, element, vector->elem_size);
@@ -52,7 +49,6 @@ extern void* vector_at(Vector* vector, size_t index) {
         printf("tried to access element %lu in vector %p, out of range (size = %lu)\n", index, vector, vector->size);
         return NULL;
     }
-    printf("accessing %lu in %p\n", index, vector);
     return vector->data + index * vector->elem_size;
 }
 

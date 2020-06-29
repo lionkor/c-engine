@@ -1,7 +1,19 @@
-#define CORE_WINDOW_INTERNAL
 #include "core_window.h"
 
+#include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_keycode.h>
 #include <string.h>
+
+HIDState* hid_state_create() {
+    HIDState* state = (HIDState*)MALLOC(sizeof(HIDState));
+    memset(state->keys, false, sizeof(state->keys));
+    memset(state->keys, false, sizeof(state->mouse_buttons));
+    return state;
+}
+
+void hid_state_destroy(HIDState* state) {
+    FREE(state);
+}
 
 Window* window_create(size_t width, size_t height, const char* title) {
     Window* window = (Window*)MALLOC(sizeof(Window));
@@ -39,6 +51,8 @@ Window* window_create(size_t width, size_t height, const char* title) {
         return NULL;
     }
 
+    window->hid_state = hid_state_create();
+
     return window;
 }
 
@@ -58,19 +72,127 @@ void window_destroy(Window* window) {
             vector_destroy(window->sdl_textures);
         }
         SDL_Quit();
+        if (window->hid_state) {
+            hid_state_destroy(window->hid_state);
+        }
     }
     FREE(window);
+}
+
+static size_t key_for_sdl_keycode(SDL_Keycode code) {
+    switch (code) {
+    case SDLK_0:
+        return KEY_0;
+    case SDLK_1:
+        return KEY_1;
+    case SDLK_2:
+        return KEY_2;
+    case SDLK_3:
+        return KEY_3;
+    case SDLK_4:
+        return KEY_4;
+    case SDLK_5:
+        return KEY_5;
+    case SDLK_6:
+        return KEY_6;
+    case SDLK_7:
+        return KEY_7;
+    case SDLK_8:
+        return KEY_8;
+    case SDLK_9:
+        return KEY_9;
+    case SDLK_a:
+        return KEY_A;
+    case SDLK_b:
+        return KEY_B;
+    case SDLK_c:
+        return KEY_C;
+    case SDLK_d:
+        return KEY_D;
+    case SDLK_e:
+        return KEY_E;
+    case SDLK_f:
+        return KEY_F;
+    case SDLK_g:
+        return KEY_G;
+    case SDLK_h:
+        return KEY_H;
+    case SDLK_i:
+        return KEY_I;
+    case SDLK_j:
+        return KEY_J;
+    case SDLK_k:
+        return KEY_K;
+    case SDLK_l:
+        return KEY_L;
+    case SDLK_m:
+        return KEY_M;
+    case SDLK_n:
+        return KEY_N;
+    case SDLK_o:
+        return KEY_O;
+    case SDLK_p:
+        return KEY_P;
+    case SDLK_q:
+        return KEY_Q;
+    case SDLK_r:
+        return KEY_R;
+    case SDLK_s:
+        return KEY_S;
+    case SDLK_t:
+        return KEY_T;
+    case SDLK_u:
+        return KEY_U;
+    case SDLK_v:
+        return KEY_V;
+    case SDLK_w:
+        return KEY_W;
+    case SDLK_x:
+        return KEY_X;
+    case SDLK_y:
+        return KEY_Y;
+    case SDLK_z:
+        return KEY_Z;
+    case SDLK_SPACE:
+        return KEY_SPACE;
+    case SDLK_ESCAPE:
+        return KEY_ESCAPE;
+    default:
+        printf("unhandled keycode: %s\n", SDL_GetScancodeName(SDL_GetScancodeFromKey(code)));
+        return 0;
+    }
 }
 
 void window_poll_events(Window* window, bool* keep_running) {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
-        if (e.type == SDL_QUIT) {
+        switch (e.type) {
+        case SDL_QUIT:
             if (keep_running) {
                 *keep_running = false;
             }
+            break;
+        case SDL_KEYDOWN: {
+            size_t key                   = key_for_sdl_keycode(e.key.keysym.sym);
+            window->hid_state->keys[key] = true;
+            break;
+        }
+        case SDL_KEYUP: {
+            size_t key                   = key_for_sdl_keycode(e.key.keysym.sym);
+            window->hid_state->keys[key] = false;
+            break;
+        }
+        default:
+            printf("event not handled: %d\n", e.type);
+            break;
         }
     }
+}
+
+const HIDState* window_hid_state(Window* window) {
+    ASSERT_NOT_NULL(window);
+    ASSERT_NOT_NULL(window->hid_state);
+    return window->hid_state;
 }
 
 size_t window_width(Window* window) {

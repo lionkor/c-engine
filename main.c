@@ -18,6 +18,10 @@ int main() {
     while (is_running) {
         window_draw(window);
         window_poll_events(window, &is_running);
+        const HIDState* state = window_hid_state(window);
+        if (state->keys[KEY_ESCAPE]) {
+            is_running = false;
+        }
     }
 
     world_destroy(world);
